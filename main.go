@@ -5,6 +5,7 @@ import (
 	"os"
 	"fmt"
 	"flag" 
+	"io/ioutil"
 )
 
 type Arguments map[string]string
@@ -24,12 +25,17 @@ type Arguments map[string]string
 const fileJSON = "users.json"
 const fPermission = 0644
 
-var operationFlag = flag.String("-operation", "-operation", "типы операций")
-var itemFlag = flag.String("-item", "-item", "значение")
-var fileNameFlag = flag.String("-fileName", "-fileName", "файл")
-
-
 func Perform(args Arguments, writer io.Writer) error {
+
+	var filename, operation,item string
+	//название, значение, описание
+	//varoperationFlag := flag.String("operation", "-operation", "типы операций")
+
+	flag.StringVar(&filename, "filename", "", "файл")
+	flag.StringVar(&operation, "operation", "list", "типы операций")
+	flag.StringVar(&item, "item", "", "значение")
+
+	flag.Parse()
 
 	file, err := os.OpenFile(fileJSON, os.O_RDWR|os.O_CREATE, fPermission)
 	//os.O_RDWR - чтение/запись
@@ -38,8 +44,16 @@ func Perform(args Arguments, writer io.Writer) error {
 	if err != nil {
 		fmt.Errorf("Error")
 	}
-	//fmt.Print(file)
+	fmt.Print(file)
 	//проверяем операции
+
+	if(filename == "list"){
+		file, err := os.OpenFile(fileJSON, os.O_RDONLY, fPermission)
+		//defer os.Remove(fileJSON)
+		fmt.Print(file)
+		fmt.Print(err)
+
+	}
 	args = Arguments{
 		"id":        "",
 		"operation": "",
