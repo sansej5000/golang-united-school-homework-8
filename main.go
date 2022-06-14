@@ -19,7 +19,7 @@ type Users []User
 
 type Arguments map[string]string
 
-const fileJSON = "users.json"
+// const fileJSON = "users.json"
 const fPermission = 0644
 
 func main() {
@@ -38,22 +38,22 @@ func Perform(args Arguments, writer io.Writer) error {
 		return errors.New("-operation flag has to be specified")
 	}
 
-	users, err := NewUsers(args["fileName"])
-	if err != nil {
-		return err
-	}
+	// users, err := NewUsers(args["fileName"])
+	// if err != nil {
+	// 	return err
+	// }
 
 	if args["operation"] == "add" {
 		if args["item"] == "" {
 			return errors.New("-item flag has to be specified")
 		}
-		err := users.Add(args["item"])
+		err := Add(args["item"], args["fileName"])
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
 		}
 	} else if args["operation"] == "list" {
-		bytes, err := users.List()
+		bytes, err := List(args["fileName"])
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func Perform(args Arguments, writer io.Writer) error {
 		if args["id"] == "" {
 			return errors.New("-id flag has to be specified")
 		}
-		bytes, err := users.FindById(args["id"])
+		bytes, err := FindById(args["id"], args["fileName"])
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func Perform(args Arguments, writer io.Writer) error {
 			return errors.New("-id flag has to be specified")
 		}
 
-		err := users.Remove(args["id"])
+		err := Remove(args["id"], args["fileName"])
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
@@ -89,24 +89,9 @@ func Perform(args Arguments, writer io.Writer) error {
 	return nil
 }
 
-func NewUsers(fileName string) (Users, error) {
-
+func readefromFile(fileName string) (Users, error) {
 	users := Users{}
-
-	if fileName != "" {
-		_, err := users.readeFile(fileName)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return users, nil
-
-}
-
-func (u *Users) readeFile(fileName string) (Users, error) {
-	users := Users{}
-	file, err := os.OpenFile(fileJSON, os.O_RDONLY|os.O_CREATE, fPermission)
+	file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, fPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -118,16 +103,16 @@ func (u *Users) readeFile(fileName string) (Users, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonBlob, u)
+	err = json.Unmarshal(jsonBlob, users)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func writeToFile(value Users) error {
+func writeToFile(value Users, fileName string) error {
 
-	file, err := os.OpenFile(fileJSON, os.O_RDWR, fPermission)
+	file, err := os.OpenFile(fileName, os.O_RDWR, fPermission)
 	if err != nil {
 		return err
 	}
@@ -138,35 +123,35 @@ func writeToFile(value Users) error {
 		return err
 	}
 	file.Write(bytes)
-	// os.Stdout.Write(bytes)
 	return nil
 }
 
-func (u *Users) Add(userJSON string) error {
+//Adding new item
+func Add(item string, fileName string) error {
 
 	user := User{}
 
-	err := json.Unmarshal([]byte(userJSON), &user)
+	err := json.Unmarshal([]byte(item), user)
 	if err != nil {
 		return err
 	}
 
-	*u = append(*u, user)
+	users, err := readefromFile(fileName)
 
-	err = writeToFile(*u)
+	users = append(users, user)
+
+	err = writeToFile(users, fileName)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *Users) List() ([]byte, error) {
+func List(fileName string) ([]byte, error) {
 
-	if len(*u) == 0 {
-		return nil, nil
-	}
+	users, err := readefromFile(fileName)
 
-	bytes, err := json.Marshal(*u)
+	bytes, err := json.Marshal(users)
 	if err != nil {
 		return nil, err
 	}
@@ -175,11 +160,13 @@ func (u *Users) List() ([]byte, error) {
 
 }
 
-func (u *Users) FindById(id string) ([]byte, error) {
+func FindById(id string, fileName string) ([]byte, error) {
 
-	for _, user := range *u {
+	users, _ := readefromFile(fileName)
+
+	for _, user := range users {
 		if user.Id == id {
-			data, err := json.Marshal(&user)
+			data, err := json.Marshal(user)
 			if err != nil {
 				return nil, err
 			}
@@ -189,20 +176,22 @@ func (u *Users) FindById(id string) ([]byte, error) {
 	return nil, nil
 }
 
-func (u *Users) Remove(id string) error {
+func Remove(id string, fileName string) error {
 
-	_, err := u.FindById(id)
+	_, err := FindById(id, fileName)
 	if err != nil {
 		return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
 	}
 
-	for i, user := range *u {
+	data, _ := readefromFile(fileName)
+
+	for i, user := range data {
 		if user.Id == id {
-			*u = append((*u)[:i], (*u)[i+1:]...)
+			data = append((data)[:i], (data)[i+1:]...)
 			return nil
 		}
 	}
-	err = writeToFile(*u)
+	err = writeToFile(data, fileName)
 	if err != nil {
 		return err
 	}
