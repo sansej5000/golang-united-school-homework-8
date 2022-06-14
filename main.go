@@ -82,8 +82,8 @@ func Perform(args Arguments, writer io.Writer) error {
 		}
 
 	} else {
-		// return errors.New(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
-		return fmt.Errorf(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
+		return errors.New(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
+		// return fmt.Errorf(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
 	}
 
 	return nil
@@ -176,8 +176,8 @@ func (u *Users) Remove(id string) error {
 		return err
 	}
 	if bytes == nil {
-		// return errors.New(fmt.Sprintf("Item with id %s not found", id))
-		return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
+		return errors.New(fmt.Sprintf("Item with id %s not found", id))
+		// return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
 	}
 	for i, user := range *u {
 		if user.Id == id {
