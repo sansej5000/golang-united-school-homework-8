@@ -107,7 +107,6 @@ func readeFile(fileName string) (Users, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return users, nil
 }
 
@@ -165,11 +164,11 @@ func (u *Users) FindById(id string) ([]byte, error) {
 
 	for _, user := range *u {
 		if user.Id == id {
-			bytes, err := json.Marshal(&user)
+			data, err := json.Marshal(&user)
 			if err != nil {
 				return nil, err
 			}
-			return bytes, nil
+			return data, nil
 		}
 	}
 	return nil, nil
@@ -177,19 +176,20 @@ func (u *Users) FindById(id string) ([]byte, error) {
 
 func (u *Users) Remove(id string) error {
 
-	bytes, err := u.FindById(id)
+	_, err := u.FindById(id)
 	if err != nil {
-		return err
-	}
-	if bytes == nil {
-		// return errors.New(fmt.Sprintf("Item with id %s not found", id))
 		return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
 	}
+
 	for i, user := range *u {
 		if user.Id == id {
 			*u = append((*u)[:i], (*u)[i+1:]...)
 			return nil
 		}
+	}
+	err = writeToFile(*u)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -223,47 +223,3 @@ func parseArgs() Arguments {
 		"fileName":  *flagFileName,
 	}
 }
-
-// func test(){
-
-// 	users, err := readefromFile(args["fileName"])
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	func readefromFile(fileName string) (Users, error) {
-
-// 		users := Users{}
-
-// 		err := users.Load(fileName)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		return users, nil
-
-// 	}
-
-// 	func (u *Users) Load(fileName string) error {
-
-// 		file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, 0644)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		defer file.Close()
-
-// 		data, err := io.ReadAll(file)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		err = json.Unmarshal(data, u)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		return nil
-
-// 	}
-// }
