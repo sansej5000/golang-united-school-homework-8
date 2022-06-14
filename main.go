@@ -47,7 +47,7 @@ func Perform(args Arguments, writer io.Writer) error {
 		if args["item"] == "" {
 			return errors.New("-item flag has to be specified")
 		}
-		err := Add(args["item"], args["fileName"])
+		err := Add(args["item"], args["fileName"], args["id"])
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
@@ -127,7 +127,12 @@ func writeToFile(value Users, fileName string) error {
 }
 
 //Adding new item
-func Add(item string, fileName string) error {
+func Add(item string, fileName string, id string) error {
+
+	data, _ := FindById(id, fileName)
+	if data != nil {
+		return errors.New(fmt.Sprintf("Item with id %s already exists", id))
+	}
 
 	user := User{}
 
