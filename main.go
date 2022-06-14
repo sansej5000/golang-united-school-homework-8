@@ -83,58 +83,11 @@ func Perform(args Arguments, writer io.Writer) error {
 
 	} else {
 		// return errors.New(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
-		// return fmt.Errorf("operation %s not allowed", args["operation"])
 		return fmt.Errorf(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
-		// return nil
 	}
 
 	return nil
 }
-
-// func NewUsers(fileName string) (Users, error) {
-
-// 	users := Users{}
-
-// 	if fileName != "" {
-// 		err := users.Load(fileName)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-
-// 	return users, nil
-
-// }
-
-// func (u *Users) Load(fileName string) error {
-
-// 	file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, 0644)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	defer func() {
-// 		err := file.Close()
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}()
-
-// 	content, err := io.ReadAll(file)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if len(content) > 0 {
-// 		err = json.Unmarshal(content, u)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}
-
-// 	return nil
-
-// }
 
 func readeFile(fileName string) (Users, error) {
 	users := Users{}
@@ -155,7 +108,7 @@ func readeFile(fileName string) (Users, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	return users, nil
 }
 
 func writeToFile(Users) error {
@@ -264,3 +217,47 @@ func parseArgs() Arguments {
 		"fileName":  *flagFileName,
 	}
 }
+
+// func test(){
+
+// 	users, err := readefromFile(args["fileName"])
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	func readefromFile(fileName string) (Users, error) {
+
+// 		users := Users{}
+
+// 		err := users.Load(fileName)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+
+// 		return users, nil
+
+// 	}
+
+// 	func (u *Users) Load(fileName string) error {
+
+// 		file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, 0644)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		defer file.Close()
+
+// 		data, err := io.ReadAll(file)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		err = json.Unmarshal(data, u)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		return nil
+
+// 	}
+// }
