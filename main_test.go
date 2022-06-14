@@ -195,7 +195,7 @@ func TestAddingOperation(t *testing.T) {
 	}
 
 	file, err := os.OpenFile(fileName, os.O_RDONLY, filePermission)
-	defer file.Close()
+	// defer file.Close()
 
 	if err != nil {
 		t.Error(err)
@@ -391,13 +391,13 @@ func TestRemovingOperation(t *testing.T) {
 	}
 
 	file, err = os.OpenFile(fileName, os.O_RDONLY, filePermission)
-	defer file.Close()
+	// defer file.Close()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	bytes, err := ioutil.ReadAll(file)
+	bytes, _ := ioutil.ReadAll(file)
 
 	if string(bytes) != expectedFileContent {
 		t.Errorf("Expect file content to be '%s', but got '%s'", expectedFileContent, bytes)
