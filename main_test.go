@@ -195,7 +195,7 @@ func TestAddingOperation(t *testing.T) {
 	}
 
 	file, err := os.OpenFile(fileName, os.O_RDONLY, filePermission)
-	// defer file.Close()
+	defer file.Close()
 
 	if err != nil {
 		t.Error(err)
@@ -391,7 +391,7 @@ func TestRemovingOperation(t *testing.T) {
 	}
 
 	file, err = os.OpenFile(fileName, os.O_RDONLY, filePermission)
-	// defer file.Close()
+	defer file.Close()
 
 	if err != nil {
 		t.Error(err)
