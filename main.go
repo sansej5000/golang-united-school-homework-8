@@ -38,7 +38,7 @@ func Perform(args Arguments, writer io.Writer) error {
 		return errors.New("-operation flag has to be specified")
 	}
 
-	users, err := readeFile(args["fileName"])
+	users, err := NewUsers(args["fileName"])
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,22 @@ func Perform(args Arguments, writer io.Writer) error {
 	return nil
 }
 
-func readeFile(fileName string) (Users, error) {
+func NewUsers(fileName string) (Users, error) {
+
+	users := Users{}
+
+	if fileName != "" {
+		_, err := users.readeFile(fileName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return users, nil
+
+}
+
+func (u *Users) readeFile(fileName string) (Users, error) {
 	users := Users{}
 	file, err := os.OpenFile(fileJSON, os.O_RDONLY|os.O_CREATE, fPermission)
 	if err != nil {
@@ -103,7 +118,7 @@ func readeFile(fileName string) (Users, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonBlob, &users)
+	err = json.Unmarshal(jsonBlob, u)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +127,7 @@ func readeFile(fileName string) (Users, error) {
 
 func writeToFile(value Users) error {
 
-	file, err := os.OpenFile(fileJSON, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fPermission)
+	file, err := os.OpenFile(fileJSON, os.O_RDWR, fPermission)
 	if err != nil {
 		return err
 	}
