@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -42,7 +43,7 @@ func Perform(args Arguments, writer io.Writer) error {
 		if args["item"] == "" {
 			return errors.New("-item flag has to be specified")
 		}
-		err := Add(args["item"], args["fileName"], args["id"], writer)
+		err := Add(args["item"], args["fileName"], writer)
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
@@ -90,18 +91,15 @@ func readefromFile(fileName string) (Users, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer file.Close()
-
 	jsonBlob, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
-
 	err = json.Unmarshal(jsonBlob, &users)
 	if err != nil {
 		return nil, err
 	}
+	file.Close()
 	return users, nil
 }
 
@@ -111,23 +109,21 @@ func writeToFile(value Users, fileName string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-
 	bytes, err := json.Marshal(value)
 	if err != nil {
 		return err
 	}
-	file.Write(bytes)
+	// file.Write(bytes)
+	err = ioutil.WriteFile(fileName, bytes, 0777)
+	if err != nil {
+		return err
+	}
+	file.Close()
 	return nil
 }
 
 //Adding new item
-func Add(item string, fileName string, id string, writer io.Writer) error {
-
-	data, _ := FindById(id, fileName, writer)
-	if data != nil {
-		return fmt.Errorf(fmt.Sprintf("Item with id %s already exists", id))
-	}
+func Add(item string, fileName string, writer io.Writer) error {
 
 	user := User{}
 
@@ -136,7 +132,12 @@ func Add(item string, fileName string, id string, writer io.Writer) error {
 		return err
 	}
 
-	users, err := readefromFile(fileName)
+	data, _ := FindById(user.Id, fileName, writer)
+	if data != nil {
+		return fmt.Errorf(fmt.Sprintf("Item with id %s already exists", user.Id))
+	}
+
+	users, _ := readefromFile(fileName)
 
 	users = append(users, user)
 
@@ -149,7 +150,7 @@ func Add(item string, fileName string, id string, writer io.Writer) error {
 
 func List(fileName string) ([]byte, error) {
 
-	users, err := readefromFile(fileName)
+	users, _ := readefromFile(fileName)
 
 	bytes, err := json.Marshal(users)
 	if err != nil {
@@ -177,21 +178,19 @@ func FindById(id string, fileName string, writer io.Writer) ([]byte, error) {
 }
 
 func Remove(id string, fileName string, writer io.Writer) error {
-
-	_, err := FindById(id, fileName, writer)
-	if err != nil {
+	dat, _ := FindById(id, fileName, writer)
+	if dat == nil {
 		return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
 	}
 
 	data, _ := readefromFile(fileName)
 
-	for i, user := range data {
+	for index, user := range data {
 		if user.Id == id {
-			data = append((data)[:i], (data)[i+1:]...)
-			return nil
+			data = append(data[:index], data[index+1:]...)
 		}
 	}
-	err = writeToFile(data, fileName)
+	err := writeToFile(data, fileName)
 	if err != nil {
 		return err
 	}

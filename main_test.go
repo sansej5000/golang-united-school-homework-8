@@ -397,7 +397,7 @@ func TestRemovingOperation(t *testing.T) {
 		t.Error(err)
 	}
 
-	bytes, _ := ioutil.ReadAll(file)
+	bytes, err := ioutil.ReadAll(file)
 
 	if string(bytes) != expectedFileContent {
 		t.Errorf("Expect file content to be '%s', but got '%s'", expectedFileContent, bytes)
