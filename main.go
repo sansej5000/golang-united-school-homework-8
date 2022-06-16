@@ -38,16 +38,11 @@ func Perform(args Arguments, writer io.Writer) error {
 		return errors.New("-operation flag has to be specified")
 	}
 
-	// users, err := NewUsers(args["fileName"])
-	// if err != nil {
-	// 	return err
-	// }
-
 	if args["operation"] == "add" {
 		if args["item"] == "" {
 			return errors.New("-item flag has to be specified")
 		}
-		err := Add(args["item"], args["fileName"], args["id"])
+		err := Add(args["item"], args["fileName"], args["id"], writer)
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
@@ -63,7 +58,7 @@ func Perform(args Arguments, writer io.Writer) error {
 		if args["id"] == "" {
 			return errors.New("-id flag has to be specified")
 		}
-		bytes, err := FindById(args["id"], args["fileName"])
+		bytes, err := FindById(args["id"], args["fileName"], writer)
 		if err != nil {
 			return err
 		}
@@ -75,7 +70,7 @@ func Perform(args Arguments, writer io.Writer) error {
 			return errors.New("-id flag has to be specified")
 		}
 
-		err := Remove(args["id"], args["fileName"])
+		err := Remove(args["id"], args["fileName"], writer)
 		if err != nil {
 			writer.Write([]byte(err.Error()))
 			return nil
@@ -103,7 +98,7 @@ func readefromFile(fileName string) (Users, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonBlob, users)
+	err = json.Unmarshal(jsonBlob, &users)
 	if err != nil {
 		return nil, err
 	}
@@ -127,16 +122,16 @@ func writeToFile(value Users, fileName string) error {
 }
 
 //Adding new item
-func Add(item string, fileName string, id string) error {
+func Add(item string, fileName string, id string, writer io.Writer) error {
 
-	data, _ := FindById(id, fileName)
+	data, _ := FindById(id, fileName, writer)
 	if data != nil {
-		return errors.New(fmt.Sprintf("Item with id %s already exists", id))
+		return fmt.Errorf(fmt.Sprintf("Item with id %s already exists", id))
 	}
 
 	user := User{}
 
-	err := json.Unmarshal([]byte(item), user)
+	err := json.Unmarshal([]byte(item), &user)
 	if err != nil {
 		return err
 	}
@@ -165,7 +160,7 @@ func List(fileName string) ([]byte, error) {
 
 }
 
-func FindById(id string, fileName string) ([]byte, error) {
+func FindById(id string, fileName string, writer io.Writer) ([]byte, error) {
 
 	users, _ := readefromFile(fileName)
 
@@ -181,9 +176,9 @@ func FindById(id string, fileName string) ([]byte, error) {
 	return nil, nil
 }
 
-func Remove(id string, fileName string) error {
+func Remove(id string, fileName string, writer io.Writer) error {
 
-	_, err := FindById(id, fileName)
+	_, err := FindById(id, fileName, writer)
 	if err != nil {
 		return fmt.Errorf(fmt.Sprintf("Item with id %s not found", id))
 	}
