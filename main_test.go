@@ -10,7 +10,6 @@ import (
 const fileName = "test.json"
 const filePermission = 0644
 
-// Common validation tests
 func TestOperationMissingError(t *testing.T) {
 	var buffer bytes.Buffer
 
@@ -74,7 +73,6 @@ func TestFileNameMissingError(t *testing.T) {
 	}
 }
 
-// List operation tests
 func TestListOperation(t *testing.T) {
 	args := Arguments{
 		"id":        "",
@@ -119,7 +117,6 @@ func TestListOperation(t *testing.T) {
 	}
 }
 
-// Adding operation tests
 func TestAddingOperationMissingItem(t *testing.T) {
 	var buffer bytes.Buffer
 	args := Arguments{
@@ -211,7 +208,6 @@ func TestAddingOperation(t *testing.T) {
 	}
 }
 
-// FindByID operation tests
 func TestFindByIdOperationMissingID(t *testing.T) {
 	var buffer bytes.Buffer
 	args := Arguments{
@@ -302,8 +298,6 @@ func TestFindByIdOperationWrongID(t *testing.T) {
 		t.Errorf("Expect output to be '%s', but got '%s'", expectedOutput, resultString)
 	}
 }
-
-// Removing operations tests
 
 func TestRemovingOperationMissingID(t *testing.T) {
 	var buffer bytes.Buffer

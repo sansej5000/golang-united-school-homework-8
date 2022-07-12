@@ -20,7 +20,6 @@ type Users []User
 
 type Arguments map[string]string
 
-// const fileJSON = "users.json"
 const fPermission = 0644
 
 func main() {
@@ -78,7 +77,6 @@ func Perform(args Arguments, writer io.Writer) error {
 		}
 
 	} else {
-		// return errors.New(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
 		return fmt.Errorf(fmt.Sprintf("Operation %s not allowed!", args["operation"]))
 	}
 
@@ -113,7 +111,6 @@ func writeToFile(value Users, fileName string) error {
 	if err != nil {
 		return err
 	}
-	// file.Write(bytes)
 	err = ioutil.WriteFile(fileName, bytes, 0777)
 	if err != nil {
 		return err
@@ -122,7 +119,6 @@ func writeToFile(value Users, fileName string) error {
 	return nil
 }
 
-//Adding new item
 func Add(item string, fileName string, writer io.Writer) error {
 
 	user := User{}
@@ -199,19 +195,6 @@ func Remove(id string, fileName string, writer io.Writer) error {
 
 func parseArgs() Arguments {
 
-	// var flagFilename, flagOperation, flagItem, flagId string
-	// flag.StringVar(&flagId, "id", "", "identification")
-	// flag.StringVar(&flagFilename, "filename", fileJSON, "file name")
-	// flag.StringVar(&flagOperation, "operation", "list", "operacions type")
-	// flag.StringVar(&flagItem, "item", "", "item")
-	// flag.Parse()
-
-	// return Arguments{
-	// 	"id":        flagId,
-	// 	"operation": flagOperation,
-	// 	"item":      flagItem,
-	// 	"filename":  flagFilename,
-	// }
 	flagId := flag.String("id", "", "User Id")
 	flagOperation := flag.String("operation", "", "Operation")
 	flagItem := flag.String("item", "", "Item")
